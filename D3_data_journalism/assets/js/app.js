@@ -1,69 +1,74 @@
 // @TODO: YOUR CODE HERE!
-//Step 1) Using D3 to read data file
-d3.csv("assets/data/data.csv").then(doTheThing);
-let globalData = 0
-
 // set the dimensions and margins of the graph
-var margin = {top: 10, right: 30, bottom: 100, left: 150},
+var margin = {top: 10, right: 30, bottom: 75, left: 75},
 width = 690 - margin.left - margin.right,
 height = 400 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
 var svg = d3.select("#scatter")
-  .append("svg")
+    .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+    .append("g")
+        .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+//Step 1) Using D3 to read data file
+d3.csv("assets/data/data.csv").then(doTheThing);
+var globalData = 0
 
 function doTheThing(csvData)
 {
     globalData = csvData;
     console.log(globalData);
-    createScatter("poverty","healthcare");
+    createScatter("poverty","obesity");
 }
 
 function createScatter(xAxis, yAxis)
 {
-
-    var maxX = Math.max.apply(Math, globalData.map(o => o[xAxis])),
-    maxY = Math.max.apply(Math, globalData.map(o => o[yAxis]));
+    //Get min and max values for axis
     minX = Math.min.apply(Math, globalData.map(o => o[xAxis]));
+    maxX = Math.max.apply(Math, globalData.map(o => o[xAxis]));
     minY = Math.min.apply(Math, globalData.map(o => o[yAxis]));
+    maxY = Math.max.apply(Math, globalData.map(o => o[yAxis]));
     
-    maxX += 5 - (maxX % 5)
-    maxY += 5 - (maxX % 5)
-    minX -= minX % 5
-    minY -= minY % 5
+    //Round axis end values to nearest multiple of r
+    var r = 2
+    minX -= minX % r
+    maxX += r - (maxX % r)
+    minY -= minY % r
+    maxY += r - (maxY % r)
 
-    // Add X axis
+    // Add X axis scale
     var x = d3.scaleLinear()
     .domain([minX, maxX])
-    .range([ 0, width ]);
+    .range([0, width]);
 
-    // Add Y axis
+    // Add Y axis scale
     var y = d3.scaleLinear()
     .domain([minY, maxY])
-    .range([ height, 0]);
+    .range([height, 0]);
 
+    // Add G tags
     var xAxisG = svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + height + ")");
     var yAxisG = svg.append("g");
     
+    //Append XAxis Text
     xAxisG.append('text')
-    // .attr('class', 'axis-label')
-    .attr('x', width / 2)
-    .attr('y', 90)
-    .text("In Poverty (%)");
+        .attr('class', 'aText')
+        .attr('x', width / 2)
+        .attr('y', margin.bottom/2)
+        .text("In Poverty (%)");
     
+    //Append YAxis Text
     yAxisG.append('text')
-    // .attr('class', 'axis-label')
-    .attr('x', -height / 2)
-    .attr('y', -100)
-    .attr('transform', `rotate(-90)`)
-    .style('text-anchor', 'middle')
-    .text("Lacks Healthcare (%)");
+        .attr('class', 'aText')
+        .attr('x', -height/2)
+        .attr('y', -margin.left/2)
+        .attr('transform', `rotate(-90)`)
+        .style('text-anchor', 'middle')
+        .text("Lacks Healthcare (%)");
     
     xAxisG.call(d3.axisBottom(x));
     yAxisG.call(d3.axisLeft(y));
@@ -96,7 +101,7 @@ function createScatter(xAxis, yAxis)
             .attr("dy", "0.35em")
             .attr("x", d => x(d[xAxis]))
             .attr("y", d => y(d[yAxis]))
-            .attr("font-size", 10)
+            .attr("font-size", 8)
             .attr("fill", "#AABBCC")
             .text(d => d.abbr);
     //add a title to act as a mousover tooltip, function tooltip() defined in a cell bleow
