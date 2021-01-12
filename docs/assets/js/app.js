@@ -21,7 +21,7 @@ function doTheThing(csvData)
 {
     globalData = csvData;
     console.log(globalData);
-    createScatter("poverty","obesity");
+    createScatter("poverty","healthcare");
 }
 
 function createScatter(xAxis, yAxis)
